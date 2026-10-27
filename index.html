@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Reloaded 🐍 | 구글 스네이크 리마스터</title>
+  <meta name="description" content="구글 스네이크 게임의 업그레이드 버전. 다크 테마, 멀티 모드, 파워업 아이템 등 새로운 기능을 경험하세요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- Main Screen -->
+  <div class="screen active" id="mainScreen">
+    <div class="main-container">
+      <div class="logo-area">
+        <div class="snake-logo">🐍</div>
+        <h1 class="game-title">Snake <span class="title-accent">Reloaded</span></h1>
+        <p class="game-subtitle">구글 스네이크의 완전한 진화</p>
+      </div>
+
+      <div class="settings-panel">
+        <div class="settings-row">
+          <label>🗺️ 맵 크기</label>
+          <div class="option-group" id="mapSizeGroup">
+            <button class="opt-btn" data-group="mapSize" data-value="small">Small</button>
+            <button class="opt-btn active" data-group="mapSize" data-value="medium">Medium</button>
+            <button class="opt-btn" data-group="mapSize" data-value="large">Large</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>⚡ 속도</label>
+          <div class="option-group" id="speedGroup">
+            <button class="opt-btn" data-group="speed" data-value="slow">🐢 느림</button>
+            <button class="opt-btn active" data-group="speed" data-value="normal">🐍 보통</button>
+            <button class="opt-btn" data-group="speed" data-value="fast">🐇 빠름</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>🎮 게임 모드</label>
+          <div class="option-group" id="modeGroup">
+            <button class="opt-btn active" data-group="mode" data-value="classic">Classic</button>
+            <button class="opt-btn" data-group="mode" data-value="peace">Peace</button>
+            <button class="opt-btn" data-group="mode" data-value="noBorder">No Border</button>
+            <button class="opt-btn" data-group="mode" data-value="portal">Portal</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>🎨 스킨</label>
+          <div class="skin-group" id="skinGroup">
+            <button class="skin-btn active" data-skin="neon" style="--sc:#00ff88;--sc2:#00ccff" title="Neon"></button>
+            <button class="skin-btn" data-skin="fire" style="--sc:#ff6600;--sc2:#ffcc00" title="Fire"></button>
+            <button class="skin-btn" data-skin="ice" style="--sc:#00ccff;--sc2:#ffffff" title="Ice"></button>
+            <button class="skin-btn" data-skin="purple" style="--sc:#cc00ff;--sc2:#ff66ff" title="Purple"></button>
+            <button class="skin-btn" data-skin="gold" style="--sc:#ffd700;--sc2:#ff8c00" title="Gold"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="highscore-display">
+        <span>🏆 최고 기록: </span><span id="highScoreDisplay">0</span>
+      </div>
+
+      <button class="play-btn" id="playBtn">
+        <span class="play-btn-text">▶ 시작하기</span>
+        <div class="play-btn-glow"></div>
+      </button>
+
+      <p class="controls-hint">↑↓←→ 또는 WASD로 조종 · Space로 일시정지</p>
+
+      <div class="fruit-guide">
+        <p class="fruit-guide-title">🍎 특수 과일 효과</p>
+        <div class="fruit-guide-grid">
+          <div class="fg-item"><span class="fg-emoji">🍌</span><span class="fg-name">바나나</span><span class="fg-desc">속도 감소 (-40%, 6초)</span></div>
+          <div class="fg-item"><span class="fg-emoji">🍇</span><span class="fg-name">포도</span><span class="fg-desc">보너스 +50점</span></div>
+          <div class="fg-item"><span class="fg-emoji">🍊</span><span class="fg-name">오렌지</span><span class="fg-desc">3칸 추가 성장</span></div>
+          <div class="fg-item"><span class="fg-emoji">🍓</span><span class="fg-name">딸기</span><span class="fg-desc">무적 (6초)</span></div>
+          <div class="fg-item"><span class="fg-emoji">🍋</span><span class="fg-name">레몬</span><span class="fg-desc">방향 반전!</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div class="screen" id="gameScreen">
+    <div class="game-header">
+      <div class="score-box">
+        <span class="score-label">점수</span>
+        <span class="score-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="mode-badge" id="modeBadge">Classic</div>
+      <div class="score-box">
+        <span class="score-label">최고점</span>
+        <span class="score-value" id="highScoreGame">0</span>
+      </div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="gameCanvas"></canvas>
+      <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-card">
+          <div class="pause-icon">⏸</div>
+          <p>일시정지</p>
+          <button class="resume-btn" id="resumeBtn">▶ 계속하기</button>
+          <button class="menu-btn-small" id="menuFromPause">🏠 메뉴로</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-footer">
+      <div class="inventory-bar">
+        <span class="inv-label">🎒 아이템</span>
+        <div class="inv-slots">
+          <div class="inv-slot empty" id="invSlot0" style="--ic:rgba(255,255,255,0.08)"><span class="inv-key-empty">Q</span></div>
+          <div class="inv-slot empty" id="invSlot1" style="--ic:rgba(255,255,255,0.08)"><span class="inv-key-empty">Z</span></div>
+          <div class="inv-slot empty" id="invSlot2" style="--ic:rgba(255,255,255,0.08)"><span class="inv-key-empty">X</span></div>
+        </div>
+      </div>
+      <div class="powerup-bar" id="powerupBar">
+        <div class="powerup-slots" id="powerupSlots"></div>
+      </div>
+      <button class="pause-btn" id="pauseBtn">⏸</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div class="screen" id="gameOverScreen">
+    <div class="gameover-card">
+      <div class="gameover-emoji" id="gameOverEmoji">💀</div>
+      <h2 class="gameover-title" id="gameOverTitle">게임 오버</h2>
+      <div class="gameover-stats">
+        <div class="stat-item">
+          <span class="stat-label">최종 점수</span>
+          <span class="stat-value" id="finalScore">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">최고 기록</span>
+          <span class="stat-value" id="finalHighScore">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">먹은 사과</span>
+          <span class="stat-value" id="finalApples">0</span>
+        </div>
+      </div>
+      <div class="new-record-badge" id="newRecordBadge" style="display:none">🎉 NEW RECORD!</div>
+      <div class="gameover-buttons">
+        <button class="play-again-btn" id="playAgainBtn">🔄 다시 하기</button>
+        <button class="menu-btn" id="menuBtn">🏠 메뉴로</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
